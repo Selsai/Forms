@@ -5,13 +5,33 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import './App.css';
 import * as yup from "yup";
 
+// Définition du schéma de validation avec Yup
 const schema = yup.object().shape({
   name: yup
     .string()
     .required("Le nom est obligatoire")
-    .min(3, "Le nom doit contenir au moins 3 caractères"),
-  dueDate: yup.date().required("La date est obligatoire"),
-  priority: yup.string().oneOf(["Basse", "Moyenne", "Elevée"], "Priorité invalide"),
+    .min(8, "Le nom doit contenir au moins 8 caractères")
+    .max(15, "Le nom ne doit pas dépasser 15 caractères"),
+  dueDate: yup
+    .string()
+    .required("La date est obligatoire")
+    .matches(
+      /^\d{2}\/\d{2}\/\d{4}$/,
+      "La date doit respecter le format jj/mm/aaaa"
+    )
+    .test(
+      "isValidDate",
+      "La date ne doit pas être antérieure à aujourd'hui",
+      (value) => {
+        const [day, month, year] = value.split("/");
+        const inputDate = new Date(`${year}-${month}-${day}`);
+        const today = new Date();
+        return inputDate >= today;
+      }
+    ),
+  priority: yup
+    .string()
+    .oneOf(["Basse", "Moyenne", "Elevée"], "Priorité invalide"),
   isCompleted: yup.boolean()
 });
 
@@ -19,21 +39,19 @@ function App() {
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors }
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      name: "", // Champ vide par défaut
-      dueDate: "", // Champ vide par défaut
-      priority: "Basse", // Priorité basse par défaut
-      isCompleted: false // Case décochée par défaut
+      name: "",
+      dueDate: "",
+      priority: "Basse",
+      isCompleted: false
     }
   });
 
   const onSubmit = (data) => {
     console.log("Données soumises :", data);
-    reset();
   };
 
   return (
@@ -55,10 +73,13 @@ function App() {
         <Form.Group className="mb-3" controlId="taskDueDate">
           <Form.Label>Date </Form.Label>
           <Form.Control
-            type="date"
+            type="text"
+            placeholder="jj/mm/aaaa"
             {...register("dueDate")}
           />
-          {errors.dueDate && <p className="text-danger">{errors.dueDate.message}</p>}
+          {errors.dueDate && (
+            <p className="text-danger">{errors.dueDate.message}</p>
+          )}
         </Form.Group>
 
         {/* Priorité */}
@@ -69,7 +90,9 @@ function App() {
             <option value="Moyenne">Moyenne</option>
             <option value="Elevée">Élevée</option>
           </Form.Control>
-          {errors.priority && <p className="text-danger">{errors.priority.message}</p>}
+          {errors.priority && (
+            <p className="text-danger">{errors.priority.message}</p>
+          )}
         </Form.Group>
 
         {/* Complétée */}
@@ -85,7 +108,6 @@ function App() {
         <Button style={{ border: 'none' }} type="submit">
          Ajouter la tâche
         </Button>
-
       </Form>
     </Container>
   );
