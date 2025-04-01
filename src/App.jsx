@@ -16,8 +16,8 @@ const schema = yup.object().shape({
     .string()
     .required("La date est obligatoire")
     .matches(
-      /^\d{2}\/\d{2}\/\d{4}$/,
-      "La date doit respecter le format jj/mm/aaaa"
+      /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/,
+      "La date doit respecter le format jj/mm/aaaa (un jour entre 01-31,un mois entre 01-12)"
     )
     .test(
       "isValidDate",
