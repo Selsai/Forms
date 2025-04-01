@@ -24,10 +24,10 @@ function App() {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      name: "Nouvelle tâche",
-      dueDate: new Date().toISOString().split("T")[0],
-      priority: "Moyenne",
-      isCompleted: false
+      name: "", // Champ vide par défaut
+      dueDate: "", // Champ vide par défaut
+      priority: "Basse", // Priorité basse par défaut
+      isCompleted: false // Case décochée par défaut
     }
   });
 
