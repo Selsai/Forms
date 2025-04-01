@@ -24,9 +24,10 @@ const schema = yup.object().shape({
       "La date ne doit pas être antérieure à aujourd'hui",
       (value) => {
         const [day, month, year] = value.split("/");
-        const inputDate = new Date(`${year}-${month}-${day}`);
+        const inputDate = new Date(year, month - 1, day, 0, 0, 0, 0); // Mois -1 et heures à zéro
         const today = new Date();
-        return inputDate >= today;
+        today.setHours(0, 0, 0, 0); // Réinitialisation des heures pour éviter les erreurs
+        return inputDate >= today; // Vérifie si la date est égale ou postérieure à aujourd'hui
       }
     ),
   priority: yup
